@@ -1,59 +1,26 @@
 
-"""
 from django.views import generic
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Album
+
+# Sync HTML views with models and database
 
 class IndexView(generic.ListView):
     template_name = 'music/index.html'
+    # Default value is 'object_list'
+    context_object_name = 'album_list'
 
+    # Return all albums from database for index.html
     def get_queryset(self):
         return Album.objects.all()
 
 class DetailView(generic.DetailView):
+    # Object list name is model name by default
     model = Album
     template_name = 'music/detail.html'
-"""
 
-
-from django.shortcuts import render, get_object_or_404
-from .models import Album, Song
-
-# Create your views here.
-# Takes requests from users and returns a response (often a webpage).
-
-
-def index(request):
-    # Retrives all album objects from the database
-    all_albums = Album.objects.all()
-    # Holds data for template to function correctly
-    context = {'all_albums': all_albums}
-    # HttpResponse is built into render() function (conversion)
-    return render(request, 'music/index.html', context)
-
-def detail(request, album_id):
-    album = get_object_or_404(Album, id=album_id)
-    return render(request, 'music/detail.html', {'album': album})
-
-
-def favorite(request, album_id):
-    album = get_object_or_404(Album, id=album_id)
-    try:
-        selected_song = album.song_set.get(id=request.POST['song'])
-    except (KeyError, Song.DoesNotExist):
-        return render(request, 'music/detail.html', {
-            'album': album,
-            'error_message': "You did not select a valid song."
-        })
-    else:
-        # Assign the value true or false on click
-        if selected_song.is_favorite:
-            selected_song.is_favorite = False
-        else:
-            selected_song.is_favorite = True
-        # Update the database with the new value
-        selected_song.save()
-        # Re-direct the user to the same page as before
-        return render(request, 'music/detail.html', {'album': album})
-
-
-
+class AlbumCreate(CreateView):
+    model = Album
+    # Specify which fields the user can fill out
+    fields = ['artist', 'album_title', 'genre', 'album_logo']
+    # template_name is automatically <class_name>_form.html
