@@ -13,6 +13,8 @@ class Album(models.Model):
     genre = models.CharField(max_length=100)
     album_logo = models.CharField(max_length=1000)
 
+    # After a form submission, re-direct to the details page of the new album
+    # Obtain the URL for a single model instance. Reverse() finds URL based on name
     def get_absolute_url(self):
         return reverse('music:detail', kwargs={'pk': self.pk})
 
